@@ -14,11 +14,10 @@ public class DeliveryGame extends JPanel{
     private final int BOTTOM_COLLISION = 4;
 
     private ArrayList<Wall> walls;
-//    private ArrayList<Baggage> baggs;
     private DeliveryTarget deliverArea;
     private PickUpTarget collectArea;
 
-    private Player soko;
+    private Player player;
     private int w = 0;
     private int h = 0;
 
@@ -49,13 +48,11 @@ public class DeliveryGame extends JPanel{
 
     private void initWorld() {
         walls = new ArrayList<>();
-//        baggs = new ArrayList<>();
 
         int x = OFFSET;
         int y = OFFSET;
 
         Wall wall;
-        Baggage b;
 
         Maze maze = new Maze(30, 20);
         String level = maze.toString();
@@ -79,7 +76,6 @@ public class DeliveryGame extends JPanel{
 
                 case '$':
                     collectArea = new PickUpTarget(x, y);
-//                    baggs.add(b);
                     x += SPACE;
                     break;
 
@@ -89,7 +85,7 @@ public class DeliveryGame extends JPanel{
                     break;
 
                 case '@':
-                    soko = new Player(x, y);
+                    player = new Player(x, y);
                     x += SPACE;
                     break;
 
@@ -114,22 +110,12 @@ public class DeliveryGame extends JPanel{
         g.setColor(new Color(0, 0, 0));
         g.drawString(String.format("Time: %.1f", time), 20, 20);
 
-        ArrayList<Actor> world = new ArrayList<>();
-
-        world.addAll(walls);
+        ArrayList<Actor> world = new ArrayList<>(walls);
         world.add(deliverArea);
         world.add(collectArea);
-//        world.addAll(baggs);
-        world.add(soko);
+        world.add(player);
 
-        for (int i = 0; i < world.size(); i++) {
-            Actor item = world.get(i);
-
-//            if (item instanceof Player || item instanceof Baggage) {
-//                g.drawImage(item.getImage(), item.x() + 2, item.y() + 2, this);
-//            } else {
-//                g.drawImage(item.getImage(), item.x(), item.y(), this);
-//            }
+        for (Actor item : world) {
             g.drawImage(item.getImage(), item.x(), item.y(), this);
 
             if (isCompleted) {
@@ -160,58 +146,42 @@ public class DeliveryGame extends JPanel{
 
             switch (key) {
                 case KeyEvent.VK_LEFT:
-                    if (checkWallCollision(soko, LEFT_COLLISION)) {
+                    if (checkWallCollision(player, LEFT_COLLISION)) {
                         return;
                     }
 
-//                    if (checkBagCollision(LEFT_COLLISION)) {
-//                        return;
-//                    }
-
-                    soko.move(-SPACE, 0);
-                    soko.setDirection(2, isCollected);
+                    player.move(-SPACE, 0);
+                    player.setDirection(2, isCollected);
                     isCompleted();
                     break;
 
                 case KeyEvent.VK_RIGHT:
-                    if (checkWallCollision(soko, RIGHT_COLLISION)) {
+                    if (checkWallCollision(player, RIGHT_COLLISION)) {
                         return;
                     }
 
-//                    if (checkBagCollision(RIGHT_COLLISION)) {
-//                        return;
-//                    }
-
-                    soko.move(SPACE, 0);
-                    soko.setDirection(0, isCollected);
+                    player.move(SPACE, 0);
+                    player.setDirection(0, isCollected);
                     isCompleted();
                     break;
 
                 case KeyEvent.VK_UP:
-                    if (checkWallCollision(soko, TOP_COLLISION)) {
+                    if (checkWallCollision(player, TOP_COLLISION)) {
                         return;
                     }
 
-//                    if (checkBagCollision(TOP_COLLISION)) {
-//                        return;
-//                    }
-
-                    soko.move(0, -SPACE);
-                    soko.setDirection(1, isCollected);
+                    player.move(0, -SPACE);
+                    player.setDirection(1, isCollected);
                     isCompleted();
                     break;
 
                 case KeyEvent.VK_DOWN:
-                    if (checkWallCollision(soko, BOTTOM_COLLISION)) {
+                    if (checkWallCollision(player, BOTTOM_COLLISION)) {
                         return;
                     }
 
-//                    if (checkBagCollision(BOTTOM_COLLISION)) {
-//                        return;
-//                    }
-
-                    soko.move(0, SPACE);
-                    soko.setDirection(3, isCollected);
+                    player.move(0, SPACE);
+                    player.setDirection(3, isCollected);
                     isCompleted();
                     break;
 
@@ -230,9 +200,7 @@ public class DeliveryGame extends JPanel{
     private boolean checkWallCollision(Actor actor, int type) {
         switch (type) {
             case LEFT_COLLISION:
-                for (int i = 0; i < walls.size(); i++) {
-                    Wall wall = walls.get(i);
-
+                for (Wall wall : walls) {
                     if (actor.isLeftCollision(wall)) {
                         return true;
                     }
@@ -240,9 +208,7 @@ public class DeliveryGame extends JPanel{
                 return false;
 
             case RIGHT_COLLISION:
-                for (int i = 0; i < walls.size(); i++) {
-                    Wall wall = walls.get(i);
-
+                for (Wall wall : walls) {
                     if (actor.isRightCollision(wall)) {
                         return true;
                     }
@@ -250,9 +216,7 @@ public class DeliveryGame extends JPanel{
                 return false;
 
             case TOP_COLLISION:
-                for (int i = 0; i < walls.size(); i++) {
-                    Wall wall = walls.get(i);
-
+                for (Wall wall : walls) {
                     if (actor.isTopCollision(wall)) {
                         return true;
                     }
@@ -260,9 +224,7 @@ public class DeliveryGame extends JPanel{
                 return false;
 
             case BOTTOM_COLLISION:
-                for (int i = 0; i < walls.size(); i++) {
-                    Wall wall = walls.get(i);
-
+                for (Wall wall : walls) {
                     if (actor.isBottomCollision(wall)) {
                         return true;
                     }
@@ -275,119 +237,11 @@ public class DeliveryGame extends JPanel{
         return false;
     }
 
-//    private boolean checkBagCollision(int type) {
-//        switch (type) {
-//            case LEFT_COLLISION:
-//                for (int i = 0; i < baggs.size(); i++) {
-//                    Baggage bag = baggs.get(i);
-//
-//                    if (soko.isLeftCollision(bag)) {
-//                        for (int j = 0; j < baggs.size(); j++) {
-//                            Baggage item = baggs.get(j);
-//
-//                            if (!bag.equals(item)) {
-//                                if (bag.isLeftCollision(item)) {
-//                                    return true;
-//                                }
-//                            }
-//
-//                            if (checkWallCollision(bag, LEFT_COLLISION)) {
-//                                return true;
-//                            }
-//                        }
-//
-//                        bag.move(-SPACE, 0);
-//                        isCompleted();
-//                    }
-//                }
-//                return false;
-//
-//            case RIGHT_COLLISION:
-//                for (int i = 0; i < baggs.size(); i++) {
-//                    Baggage bag = baggs.get(i);
-//
-//                    if (soko.isRightCollision(bag)) {
-//                        for (int j = 0; j < baggs.size(); j++) {
-//                            Baggage item = baggs.get(j);
-//
-//                            if (!bag.equals(item)) {
-//                                if (bag.isRightCollision(item)) {
-//                                    return true;
-//                                }
-//                            }
-//
-//                            if (checkWallCollision(bag, RIGHT_COLLISION)) {
-//                                return true;
-//                            }
-//                        }
-//
-//                        bag.move(SPACE, 0);
-//                        isCompleted();
-//                    }
-//                }
-//                return false;
-//
-//            case TOP_COLLISION:
-//                for (int i = 0; i < baggs.size(); i++) {
-//                    Baggage bag = baggs.get(i);
-//
-//                    if (soko.isTopCollision(bag)) {
-//                        for (int j = 0; j < baggs.size(); j++) {
-//                            Baggage item = baggs.get(j);
-//
-//                            if (!bag.equals(item)) {
-//                                if (bag.isTopCollision(item)) {
-//                                    return true;
-//                                }
-//                            }
-//
-//                            if (checkWallCollision(bag, TOP_COLLISION)) {
-//                                return true;
-//                            }
-//                        }
-//
-//                        bag.move(0, -SPACE);
-//                        isCompleted();
-//                    }
-//                }
-//                return false;
-//
-//            case BOTTOM_COLLISION:
-//                for (int i = 0; i < baggs.size(); i++) {
-//                    Baggage bag = baggs.get(i);
-//
-//                    if (soko.isBottomCollision(bag)) {
-//                        for (int j = 0; j < baggs.size(); j++) {
-//                            Baggage item = baggs.get(j);
-//
-//                            if (!bag.equals(item)) {
-//                                if (bag.isBottomCollision(item)) {
-//                                    return true;
-//                                }
-//                            }
-//
-//                            if (checkWallCollision(bag,BOTTOM_COLLISION)) {
-//                                return true;
-//                            }
-//                        }
-//
-//                        bag.move(0, SPACE);
-//                        isCompleted();
-//                    }
-//                }
-//                return false;
-//
-//            default:
-//                break;
-//        }
-//        return false;
-//    }
-
     public void isCompleted() {
-        if (soko.x() == collectArea.x() && soko.y() == collectArea.y()) {
+        if (player.x() == collectArea.x() && player.y() == collectArea.y()) {
             isCollected = true;
         }
-        if (soko.x() == deliverArea.x() && soko.y() == deliverArea.y() && isCollected) {
+        if (player.x() == deliverArea.x() && player.y() == deliverArea.y() && isCollected) {
             isCompleted = true;
             timer.stop();
             repaint();
@@ -395,7 +249,6 @@ public class DeliveryGame extends JPanel{
     }
 
     public void restartLevel() {
-//        baggs.clear();
         timer.stop();  // Ensures reset of timer when first starting the level
         walls.clear();
         time = 0;
